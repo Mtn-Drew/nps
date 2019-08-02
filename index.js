@@ -3,25 +3,22 @@
 const searchURL = 'https://developer.nps.gov/api/v1/parks';
 const apiKey = 'jeUZvM7Vfk1LTuMVUJpMH8mruyWN9p6hbf4z6lBd'
 
-
 function formatQueryParams(params) {
   const queryItems = Object.keys(params)
     .map(key => `${key}=${params[key]}`)
   return queryItems.join('&');
 }
 
-
 function displayResults(responseJson) {
   // if there are previous results, remove them
   console.log(responseJson);
   $('#results-list').empty();
   console.log(responseJson.data.fullName);
-  for (let result in responseJson) {
+  for (let result of responseJson.data) {
     $('#results-list').append(`
-      <p>Park Name: ${result.data.fullName}</p>
-      <p>Description: ${result.data.description}</p>
-      <p>Website URL: ${result.data.url}</p>
-      <p>Address: ${result.data.addresses}</p>
+      <h2><p>Park Name: ${result.fullName}</p></h2>
+      <p>Description: ${result.description}</p>
+      <p>Website URL: ${result.url}</p>
   `)};
 };
 
@@ -35,11 +32,6 @@ function getParkInfo(query, maxResults) {
   const url = `${searchURL}?${queryString}&api_key=${apiKey}`;
 
   console.log(url);
-
-  // const options = {   ****************************************
-  //   headers: new Headers({
-  //     "X-Api-Key": apiKey})
-  // };
 
   fetch(url)
     .then(response => {
@@ -60,7 +52,6 @@ function getParkInfo(query, maxResults) {
 function watchForm() {
   $('form').submit(event => {
     event.preventDefault();
-    // will need code here to run multiple states ******************************
     const searchTerm = $('#js-search-term').val();
     const maxResults = $('#js-max-results').val();
     getParkInfo(searchTerm, maxResults);
