@@ -1,22 +1,46 @@
 'use strict';
 
-const searchURL = 'https://api.github.com/users/';
+const searchURL = 'https://developer.nps.gov/api/v1/parks';
+const apiKey = 'jeUZvM7Vfk1LTuMVUJpMH8mruyWN9p6hbf4z6lBd'
+
+
+function formatQueryParams(params) {
+  const queryItems = Object.keys(params)
+    .map(key => `${key}=${params[key]}`)
+  return queryItems.join('&');
+}
+
 
 function displayResults(responseJson) {
   // if there are previous results, remove them
   console.log(responseJson);
   $('#results-list').empty();
-  for (let result of responseJson) {
+  console.log(responseJson.data.fullName);
+  for (let result in responseJson) {
     $('#results-list').append(`
-      <p>Repo: ${result.name}</p>
-      <p>Link: ${result.url}</p>
+      <p>Park Name: ${result.data.fullName}</p>
+      <p>Description: ${result.data.description}</p>
+      <p>Website URL: ${result.data.url}</p>
+      <p>Address: ${result.data.addresses}</p>
   `)};
 };
 
-function getRepos(query) {
+function getParkInfo(query, maxResults) {
 
-  const url = `${searchURL}${query}/repos`; 
+  const params = {
+    stateCode : query,
+    limit: maxResults,
+  };
+  const queryString = formatQueryParams(params)
+  const url = `${searchURL}?${queryString}&api_key=${apiKey}`;
+
   console.log(url);
+
+  // const options = {   ****************************************
+  //   headers: new Headers({
+  //     "X-Api-Key": apiKey})
+  // };
+
   fetch(url)
     .then(response => {
       if (response.ok) {
@@ -36,8 +60,11 @@ function getRepos(query) {
 function watchForm() {
   $('form').submit(event => {
     event.preventDefault();
+    // will need code here to run multiple states ******************************
     const searchTerm = $('#js-search-term').val();
-    getRepos(searchTerm);
+    const maxResults = $('#js-max-results').val();
+    getParkInfo(searchTerm, maxResults);
+    
   });
 }
 
